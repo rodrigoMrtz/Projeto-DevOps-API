@@ -6,76 +6,261 @@
 ![PostgreSQL](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)
 ![Git](https://img.shields.io/badge/git-%23F05033.svg?style=for-the-badge&logo=git&logoColor=white)
 
-Este projeto demonstra a criação, conteinerização e orquestração de uma API moderna em Python (FastAPI) integrada a um banco de dados relacional PostgreSQL. Desenvolvido com foco em boas práticas de **DevOps**, isolamento de ambiente e segurança de infraestrutura.
+Este projeto demonstra a criação, conteinerização e orquestração de uma API moderna em Python utilizando **FastAPI**, integrada ao banco de dados relacional **PostgreSQL**.
+
+Desenvolvido com foco em boas práticas de:
+
+- DevOps
+- Segurança
+- Isolamento de ambientes
+- Conteinerização
+- Organização profissional de projetos
 
 ---
 
-## 🏗️ Arquitetura e Fluxo do Ambiente
+# 🏗️ Arquitetura e Fluxo do Ambiente
 
-O ambiente foi desenhado para simular um cenário real de microsserviços localmente, utilizando o **Docker Compose** para isolar os serviços em uma rede interna privada (`api_network`).
+O ambiente foi desenvolvido simulando um cenário real utilizando **Docker Compose**, onde os serviços são executados em containers isolados dentro de uma rede privada chamada:
+
+```
+api_network
+```
+
+Arquitetura:
+
+```text
+                ┌────────────────────────┐
+                │ Usuário / Navegador    │
+                └───────────┬────────────┘
+                            │
+                            │ Porta 8080
+                            ▼
+
+        ┌────────────────────────────────────┐
+        │          Docker Network            │
+        │          api_network               │
+        │                                    │
+        │                                    │
+        │   ┌────────────────────────┐       │
+        │   │       Container        │       │
+        │   │        web-api         │       │
+        │   │       FastAPI          │       │
+        │   │                        │       │
+        │   └───────────┬────────────┘       │
+        │               │                    │
+        │               │ Comunicação interna│
+        │               │ Porta 5432         │
+        │               ▼                    │
+        │                                    │
+        │   ┌────────────────────────┐       │
+        │   │       Container        │       │
+        │   │          db            │       │
+        │   │     PostgreSQL 15      │       │
+        │   │                        │       │
+        │   └────────────────────────┘       │
+        │                                    │
+        └────────────────────────────────────┘
+```
+
+## Serviços
+
+### 🚀 web-api
+
+Container responsável pela API.
+
+Características:
+
+- Baseado em `python:3.11-alpine`
+- Executa aplicação FastAPI
+- Porta interna: `8000`
+- Exposta no host como:
+
+```
+8080
+```
+
 ---
-[ Usuário / Navegador ]
-│ (Porta 8080) |
-▼
-┌────────────────────────────────────────┐
-│             Docker Network             │
-│                                        │
-│  ┌──────────────────┐                  │
-│  │    Container     │                  │
-│  │    web-api       │                  │
-│  │   (FastAPI)      │                  │
-│  └────────┬─────────┘                  │
-│           │                            │
-│           │ (Porta interna 5432)       │
-│           ▼                            │
-│  ┌──────────────────┐                  │
-│  │    Container     │                  │
-│  │       db         │                  │
-│  │   (PostgreSQL)   │                  │
-│  └──────────────────┘                  │
-└────────────────────────────────────────┘
-1. **`web-api`**: Container baseado na imagem leve `python:3.11-alpine`. Expõe a porta 8000 internamente, mapeada para a 8080 no host.
-2. **`db`**: Container oficial `postgres:15-alpine`. Os dados são persistidos utilizando volumes do Docker para evitar perda de dados em caso de reinicialização do ambiente.
+
+### 🗄️ db
+
+Container responsável pelo banco de dados.
+
+Características:
+
+- Imagem oficial:
+
+```
+postgres:15-alpine
+```
+
+- Dados persistentes usando volumes Docker
+- Evita perda de dados após reinicialização dos containers
 
 ---
 
-## 🔒 Boas Práticas de DevOps & Segurança Aplicadas
+# 🔒 Boas Práticas de DevOps & Segurança
 
-* **Isolamento de Credenciais:** Nenhuma chave secreta ou senha do banco de dados foi exposta no código-fonte. O projeto utiliza variáveis de ambiente injetadas via `python-dotenv` localmente e gerenciadas dinamicamente no Runtime pelo Docker Compose.
-* **Otimização de Imagens:** Utilização de imagens base `Alpine Linux`, reduzindo drasticamente o tamanho final da imagem e a superfície de vulnerabilidades.
-* **Higiene de Commits:** Utilização do padrão *Conventional Commits* para manter o histórico do Git limpo, documentado e profissional.
-* **Arquivos de Ignorados (`.gitignore` e `.dockerignore`):** Configurados rigorosamente para impedir o vazamento de caches do Python, ambientes virtuais (`venv`) e arquivos locais sensíveis (`.env`).
+## 🔐 Isolamento de Credenciais
+
+Nenhuma senha ou chave sensível fica versionada.
+
+O projeto utiliza:
+
+- `.env`
+- Variáveis de ambiente
+- Docker Compose
+
+As configurações são carregadas somente em runtime.
 
 ---
 
-## Como Rodar o Projeto Localmente
+## 📦 Otimização de Imagens
 
-### Pré-requisitos
-* Git instalado
-* Docker e Docker Compose instalados e rodando
+Utilização de imagens baseadas em:
 
-### 1. Clonar o repositório
+```
+Alpine Linux
+```
+
+Benefícios:
+
+- Menor tamanho
+- Menor superfície de ataque
+- Inicialização mais rápida
+
+---
+
+## 📝 Padrão de Commits
+
+Utilizado:
+
+```
+Conventional Commits
+```
+
+Exemplo:
+
+```
+feat: adiciona autenticação JWT
+
+fix: corrige conexão com banco
+
+docs: atualiza documentação
+```
+
+---
+
+## 🚫 Arquivos Ignorados
+
+Configurado:
+
+- `.gitignore`
+- `.dockerignore`
+
+Bloqueando:
+
+```
+venv/
+__pycache__/
+.env
+*.pyc
+```
+
+---
+
+# 🚀 Como Rodar o Projeto Localmente
+
+## Pré-requisitos
+
+Instalar:
+
+- Git
+- Docker
+- Docker Compose
+
+---
+
+# 1. Clonar o projeto
+
 ```bash
-git clone [https://github.com/rodrigoMrtz/Projeto-DevOps-API.git](https://github.com/rodrigoMrtz/Projeto-DevOps-API.git)
+git clone https://github.com/rodrigoMrtz/Projeto-DevOps-API.git
+
 cd Projeto-DevOps-API
 ```
-### 2. Configurar as Variáveis de Ambiente
-O repositório possui um arquivo de exemplo. Crie uma cópia dele e configure suas chaves se desejar:
-```
+
+---
+
+# 2. Configurar variáveis de ambiente
+
+Copie o arquivo de exemplo:
+
+```bash
 cp .env.example .env
 ```
-### 3. Subir a Infraestrutura
-Com apenas um comando, o Docker Compose vai baixar as imagens, criar a rede interna, configurar o banco de dados e iniciar a API:
-```
+
+Configure os valores necessários.
+
+---
+
+# 3. Subir infraestrutura
+
+Execute:
+
+```bash
 docker compose up -d
 ```
-A API estará disponível e pronta para receber requisições em: http://127.0.0.1:8080
 
-### Comandos Úteis Utilizados
-* docker compose ps - Verifica o status dos containers ativos.
+O Docker irá:
 
-* docker compose logs -f web-api - Acompanha os logs da API em tempo real.
+- Criar a rede
+- Criar containers
+- Configurar PostgreSQL
+- Iniciar API
 
-* docker compose down - Desliga e remove os containers e redes criadas pelo Compose.
+---
 
-Desenvolvido por Rodrigo Martinez Ortiz
+# 🌐 Acessar API
+
+A aplicação estará disponível em:
+
+```
+http://127.0.0.1:8080
+```
+
+Documentação automática FastAPI:
+
+```
+http://127.0.0.1:8080/docs
+```
+
+---
+
+# 🛠️ Comandos Úteis
+
+Ver containers ativos:
+
+```bash
+docker compose ps
+```
+
+---
+
+Acompanhar logs da API:
+
+```bash
+docker compose logs -f web-api
+```
+
+---
+
+Parar ambiente:
+
+```bash
+docker compose down
+```
+
+---
+
+# 👨‍💻 Desenvolvido por
+
+**Rodrigo Martinez Ortiz**
