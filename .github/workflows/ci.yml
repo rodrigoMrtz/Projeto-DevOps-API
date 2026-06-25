@@ -16,11 +16,11 @@ jobs:
     steps:
     # Passo 1: Copia o código do seu repositório para dentro da máquina virtual
     - name: Baixar o código do repositório
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
 
     # Passo 2: Configura o ambiente Python na máquina virtual
     - name: Configurar o Python 3.11
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: "3.11"
 
