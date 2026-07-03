@@ -10,3 +10,21 @@ env/
 __pycache__/
 *.pyc
 .pytest_cache/
+
+# Ignorar arquivos locais do diretório Terraform
+.terraform/
+**/.terraform/
+
+# Ignorar arquivos de estado do Terraform
+*.tfstate
+*.tfstate.backup
+*.tfstate.lock.info
+
+# Ignorar variaveis de ambiente do Terraform
+*.tfvars
+*.tfvars.json
+
+# Ignorar planos de execução e sobrescritas do Terraform
+*.tfplan
+*override.tf
+*override.tf.json
