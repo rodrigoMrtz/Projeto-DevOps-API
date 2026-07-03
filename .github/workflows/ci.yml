@@ -14,6 +14,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    # ==========================================
+    # PASSOS DE APLICAÇÃO E DOCKER
+    # ==========================================
     # Passo 1: Copia o código do seu repositório para dentro da máquina virtual
     - name: Baixar o código do repositório
       uses: actions/checkout@v5
@@ -30,11 +33,36 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    # Passo 4: O teste de fogo do DevOps — Validar o build da imagem Docker
+    # Passo 4: Validar o build da imagem Docker
     - name: Testar a construção da Imagem Docker
       run: |
         docker build -t minha-api-test-ci:${{ github.sha }} .
 
-    # Passo 5: Mensagem de sucesso nos logs
+    # ==========================================
+    # PASSOS DE VALIDAÇÃO DO TERRAFORM
+    # ==========================================
+
+    # Passo 6: Instala o Terraform na máquina virtual
+    - name: Configurar o Terraform
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: "1.5.7"
+    
+    # Passo 7: Validar a Formatação do Terraform
+    - name: Validar a formatação do Terraform
+      run: terraform fmt -check -recursive
+      working-directory: ./terraform
+    
+    # Passo 8: Inicializar o Terraform
+    - name: Inicializar o Terraform no Runner
+      run: terraform init
+      working-directory: ./terraform
+
+    # Passo 9: Validar a Sintaxe e Configuração do Terraform
+    - name: Validar a sintaxe e Lógica do Terraform
+      run: terraform validate
+      working-directory: ./terraform
+
+    # Mensagem de sucesso nos logs
     - name: Feedback de conclusão
-      run: echo "Parabéns! A imagem Docker foi validada e construída sem erros na esteira."
+      run: echo "Parabéns! Docker e Terraform foram validados com sucesso no pipeline."
