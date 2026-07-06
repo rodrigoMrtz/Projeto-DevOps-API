@@ -123,7 +123,7 @@ resource "aws_instance" "web_server" {
   subnet_id                   = aws_subnet.public_subnet.id
   vpc_security_group_ids      = [aws_security_group.ec2_sg.id]
   associate_public_ip_address = true # Atribuir um IP público à instância
-  key_name                   = aws_key_pair.ec2_key.key_name
+  key_name                    = aws_key_pair.ec2_key.key_name
 
   tags = {
     Name = "${var.projeto_name}-api-server"
