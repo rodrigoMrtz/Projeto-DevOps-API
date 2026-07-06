@@ -60,6 +60,8 @@ jobs:
 
     # Passo 9: Validar a Sintaxe e Configuração do Terraform
     - name: Validar a sintaxe e Lógica do Terraform
+      env:
+        TF_VAR_ssh_public_key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAACIfakekeyforvalidate"
       run: terraform validate
       working-directory: ./terraform
 
