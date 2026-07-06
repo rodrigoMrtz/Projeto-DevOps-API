@@ -15,6 +15,7 @@ __pycache__/
 .terraform/
 **/.terraform/
 
+
 # Ignorar arquivos de estado do Terraform
 *.tfstate
 *.tfstate.backup
@@ -28,3 +29,7 @@ __pycache__/
 *.tfplan
 *override.tf
 *override.tf.json
+
+# Ignorar chaves SSH
+my-ec2-key
+my-ec2-key.pub
