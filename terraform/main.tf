@@ -110,6 +110,12 @@ resource "aws_security_group_rule" "allow_all_egress" {
   description       = "Allow all egress traffic"
 }
 
+# Criando o Key Pair para acessar a instância EC2
+resource "aws_key_pair" "ec2_key" {
+  key_name   = "${var.projeto_name}-key"
+  public_key = file("${path.module}/my-ec2-key.pub")
+}
+
 # Criando a Instância EC2 (Servidor Virtual) para hospedar a API 
 resource "aws_instance" "web_server" {
   ami                         = "ami-0c7217cdde317cfec" # ID da AMI (Amazon Machine Image) para a instância
@@ -117,6 +123,7 @@ resource "aws_instance" "web_server" {
   subnet_id                   = aws_subnet.public_subnet.id
   vpc_security_group_ids      = [aws_security_group.ec2_sg.id]
   associate_public_ip_address = true # Atribuir um IP público à instância
+  key_name                   = aws_key_pair.ec2_key.key_name
 
   tags = {
     Name = "${var.projeto_name}-api-server"
