@@ -67,3 +67,58 @@ resource "aws_route_table_association" "public_association" {
   subnet_id      = aws_subnet.public_subnet.id
   route_table_id = aws_route_table.public_rt.id
 }
+
+# Criando o Security Group para a instância EC2
+resource "aws_security_group" "ec2_sg" {
+  name        = "${var.projeto_name}-ec2-sg"
+  description = "Security Group para o servidor da API"
+  vpc_id      = aws_vpc.main_vpc.id
+
+  tags = {
+    Name = "${var.projeto_name}-ec2-sg"
+  }
+}
+# Regra de Entrada: Permitir tráfego HTTP (porta 80) de qualquer lugar
+resource "aws_security_group_rule" "allow_http" {
+  type              = "ingress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.ec2_sg.id
+  description       = "Allow HTTP traffic from anywhere"
+}
+# Regra de Entrada: Permitir tráfego SSH (porta 22) de qualquer lugar
+resource "aws_security_group_rule" "allow_ssh" {
+  type              = "ingress"
+  from_port         = 22
+  to_port           = 22
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.ec2_sg.id
+  description       = "Allow SSH traffic from anywhere"
+}
+
+# Regra de Saída: Permitir que o servidor acesse a internet
+resource "aws_security_group_rule" "allow_all_egress" {
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1" #-1 significa todos os protocolos
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.ec2_sg.id
+  description       = "Allow all egress traffic"
+}
+
+# Criando a Instância EC2 (Servidor Virtual) para hospedar a API 
+resource "aws_instance" "web_server" {
+  ami                         = "ami-0c7217cdde317cfec" # ID da AMI (Amazon Machine Image) para a instância
+  instance_type               = "t3.micro"              # Tipo da instância (ex: t2.micro, t3.micro, etc.)
+  subnet_id                   = aws_subnet.public_subnet.id
+  vpc_security_group_ids      = [aws_security_group.ec2_sg.id]
+  associate_public_ip_address = true # Atribuir um IP público à instância
+
+  tags = {
+    Name = "${var.projeto_name}-api-server"
+  }
+}
