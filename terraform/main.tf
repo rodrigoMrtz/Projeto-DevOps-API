@@ -113,7 +113,7 @@ resource "aws_security_group_rule" "allow_all_egress" {
 # Criando o Key Pair para acessar a instância EC2
 resource "aws_key_pair" "ec2_key" {
   key_name   = "${var.projeto_name}-key"
-  public_key = file("${path.module}/my-ec2-key.pub")
+  public_key = var.ssh_public_key
 }
 
 # Criando a Instância EC2 (Servidor Virtual) para hospedar a API 

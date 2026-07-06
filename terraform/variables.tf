@@ -9,3 +9,8 @@ variable "projeto_name" {
   type        = string
   default     = "projeto-api-devops"
 }
+
+variable "ssh_public_key" {
+  type        = string
+  description = "Chave pública SSH ED25519 para acesso à instância EC2"
+}
