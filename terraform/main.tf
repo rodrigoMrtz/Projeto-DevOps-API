@@ -78,6 +78,18 @@ resource "aws_security_group" "ec2_sg" {
     Name = "${var.projeto_name}-ec2-sg"
   }
 }
+
+# Regra de Entrada: Permitir tráfego na porta 3000 (API) de qualquer lugar
+resource "aws_security_group_rule" "allow_api_port" {
+  type              = "ingress"
+  from_port         = 3000
+  to_port           = 3000
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.ec2_sg.id
+  description       = "Allow API traffic from anywhere"
+}
+
 # Regra de Entrada: Permitir tráfego HTTP (porta 80) de qualquer lugar
 resource "aws_security_group_rule" "allow_http" {
   type              = "ingress"
@@ -98,6 +110,7 @@ resource "aws_security_group_rule" "allow_ssh" {
   security_group_id = aws_security_group.ec2_sg.id
   description       = "Allow SSH traffic from anywhere"
 }
+
 
 # Regra de Saída: Permitir que o servidor acesse a internet
 resource "aws_security_group_rule" "allow_all_egress" {
