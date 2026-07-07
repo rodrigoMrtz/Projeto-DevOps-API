@@ -13,8 +13,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # 5. Copia o restante do código do projeto (app.py, .env.example, etc.)
 COPY . .
 
-# 6. Informa a porta que o container vai liberar (FastAPI usa a 8000 por padrão)
-EXPOSE 8000
+# 6. Informa a porta que o container vai liberar 
+EXPOSE 3000
 
 # 7. Comando que inicializa a API quando o container ligar
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "3000"]
