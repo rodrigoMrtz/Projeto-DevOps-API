@@ -125,6 +125,9 @@ resource "aws_instance" "web_server" {
   associate_public_ip_address = true # Atribuir um IP público à instância
   key_name                    = aws_key_pair.ec2_key.key_name
 
+  # Configurando o User Data para inicializar a instância com um script para instalar o Docker
+  user_data = file("${path.module}/userdata.sh")
+
   tags = {
     Name = "${var.projeto_name}-api-server"
   }
