@@ -9,8 +9,8 @@ echo "Iniciando automação do User Data..."
 
 apt-get update -y
 
-# Instala o Docker oficial
-apt-get install -y docker.io
+# Instala o Docker oficial e o Docker Compose v2
+apt-get install -y docker.io docker-compose-v2
 
 # Inicia e habilita o serviço do Docker
 systemctl start docker
