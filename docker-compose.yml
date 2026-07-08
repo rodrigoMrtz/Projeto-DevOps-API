@@ -18,7 +18,7 @@ services:
 
   # Serviço 2: A nossa API Python
   web-api:
-    build: .
+    image: ${{ secrets.DOCKERHUB_USERNAME }}/minha-api-devops:latest
     container_name: devops-python-api
     restart: always
     ports:
