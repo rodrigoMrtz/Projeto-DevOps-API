@@ -1,188 +1,105 @@
-# 🐋 API Python Orquestrada com Docker Compose & PostgreSQL
+# API Python Orquestrada com Docker Compose, PostgreSQL, Terraform e AWS EC2
 
-![CI Pipeline](https://github.com/rodrigoMrtz/Projeto-DevOps-API/actions/workflows/ci.yml/badge.svg)
+<p align="center">
 
-![AWS](https://img.shields.io/badge/AWS-%23FF9900.svg?style=for-the-badge&logo=amazon-aws&logoColor=white)
-![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
-![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)
-![PostgreSQL](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)
-![Git](https://img.shields.io/badge/git-%23F05033.svg?style=for-the-badge&logo=git&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3.11-blue?style=for-the-badge&logo=python)
+![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi)
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql)
+![Terraform](https://img.shields.io/badge/Terraform-623CE4?style=for-the-badge&logo=terraform)
+![AWS](https://img.shields.io/badge/AWS-232F3E?style=for-the-badge&logo=amazonaws)
+![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge&logo=github-actions)
 
-Este projeto demonstra a criação, conteinerização e orquestração de uma API moderna em Python utilizando **FastAPI**, integrada ao banco de dados relacional **PostgreSQL**.
+</p>
 
-Desenvolvido com foco em boas práticas de:
+Este projeto demonstra o ciclo completo de Engenharia de DevOps para a criação, conteinerização, automação de testes/build (CI) e deploy (CD) de uma API baseada em FastAPI integrada a um banco de dados relacional PostgreSQL.
 
-- DevOps
-- Segurança
-- Isolamento de ambientes
-- Conteinerização
-- Organização profissional de projetos
+Desenvolvido com foco em automação de infraestrutura, segurança de credenciais e esteiras de implantação automatizadas.
 
 ---
 
-# 🏗️ Arquitetura e Fluxo do Ambiente
+# Arquitetura e Fluxo do Ambiente
 
-O ambiente foi desenvolvido simulando um cenário real utilizando **Docker Compose**, onde os serviços são executados em containers isolados dentro de uma rede privada chamada:
+O ecossistema foi desenhado para rodar de forma isolada dentro de uma instância EC2 na AWS, utilizando Docker Compose para orquestrar os serviços em uma rede privada.
 
-```
-api_network
-```
+Arquitetura de Rede e Portas:
 
-Arquitetura:
-
-```text
                 ┌────────────────────────┐
-                │ Usuário / Navegador    │
+                │   Acesso Externo       │
+                │ (Internet / Navegador) │
                 └───────────┬────────────┘
                             │
-                            │ Porta 8080
+                            │ Porta 3000 (Liberada via Terraform Security Group)
                             ▼
-
         ┌────────────────────────────────────┐
-        │          Docker Network            │
-        │          api_network               │
-        │                                    │
+        │          Instancia AWS EC2         │
         │                                    │
         │   ┌────────────────────────┐       │
-        │   │       Container        │       │
+        │   │    Docker Container    │       │
         │   │        web-api         │       │
-        │   │       FastAPI          │       │
-        │   │                        │       │
+        │   │   Porta Interna: 8000  │       │
+        │   │   Exposta Host: 3000   │       │
         │   └───────────┬────────────┘       │
         │               │                    │
-        │               │ Comunicação interna│
+        │               │ Rede api_network   │
         │               │ Porta 5432         │
         │               ▼                    │
-        │                                    │
         │   ┌────────────────────────┐       │
-        │   │       Container        │       │
+        │   │    Docker Container    │       │
         │   │          db            │       │
         │   │     PostgreSQL 15      │       │
-        │   │                        │       │
         │   └────────────────────────┘       │
-        │                                    │
         └────────────────────────────────────┘
-```
 
-## Serviços
 
-### 🚀 web-api
 
-Container responsável pela API.
+## Serviços Orquestrados
 
-Características:
+### web-api
+Container responsável pela execução da API.
+- Imagem base: rodrigomrtz/minha-api-devops:latest (Buildada via GitHub Actions).
+- Framework: FastAPI (Python 3.11 baseado em Alpine Linux).
 
-- Baseado em `python:3.11-alpine`
-- Executa aplicação FastAPI
-- Porta interna: `8000`
-- Exposta no host como:
-
-```
-8080
-```
+### db
+Container responsável pela camada de persistência de dados.
+- Imagem base oficial: postgres:15-alpine.
+- Persistência: Configurado com Named Volumes (postgres_data) para evitar a perda de dados em caso de reinicialização ou destruição do container.
+- Isolamento: Acessível externamente apenas via API dentro da rede isolada do Docker.
 
 ---
 
-### 🗄️ db
+# Esteira de DevOps e Segurança
 
-Container responsável pelo banco de dados.
+## 1. Proteção Local (Git Hooks)
+O projeto conta com validações automatizadas antes do envio do código. O arquivo de pre-commit barra modificações que violem a sintaxe ou que deixem configurações de variáveis expostas antes de validar os arquivos do Terraform.
 
-Características:
+## 2. Integracao Continua (GitHub Actions)
+Toda alteração unificada na branch principal dispara uma esteira automatizada que realiza:
+- Autenticação criptografada no Docker Hub via Repository Secrets.
+- Build isolado e otimizado da imagem Docker da API.
+- Push da imagem gerada para o registro público sob a tag rodrigomrtz/minha-api-devops:latest.
 
-- Imagem oficial:
+## 3. Infraestrutura como Codigo (Terraform)
+Toda a infraestrutura de nuvem na AWS (VPC, Subnets, Internet Gateway, Route Tables, Security Groups e Instância EC2) é declarada de forma imutável e escalável utilizando arquivos de configuração do Terraform. O provisionamento inicial do Docker e Docker Compose no Ubuntu ocorre automaticamente no boot da máquina via instruções de User Data.
 
-```
-postgres:15-alpine
-```
-
-- Dados persistentes usando volumes Docker
-- Evita perda de dados após reinicialização dos containers
-
----
-
-# 🔒 Boas Práticas de DevOps & Segurança
-
-## 🔐 Isolamento de Credenciais
-
-Nenhuma senha ou chave sensível fica versionada.
-
-O projeto utiliza:
-
-- `.env`
-- Variáveis de ambiente
-- Docker Compose
-
-As configurações são carregadas somente em runtime.
+## 4. Gerenciamento de Credenciais
+Arquivos de ambiente (.env) estão explicitamente inclusos no .gitignore e .dockerignore. A API resgata as chaves em runtime por meio de injeções diretas passadas pelo ambiente do Docker Compose no servidor.
 
 ---
 
-## 📦 Otimização de Imagens
+# Padrao de Commits
+O projeto adota estritamente a especificação de Conventional Commits para manter o histórico de mudanças limpo e legível.
 
-Utilização de imagens baseadas em:
-
-```
-Alpine Linux
-```
-
-Benefícios:
-
-- Menor tamanho
-- Menor superfície de ataque
-- Inicialização mais rápida
+Exemplos:
+- feat: adiciona automacao de volumes no postgres
+- fix: corrige conflito de portas entre host e container
+- docs: atualiza readme com arquitetura de rede da AWS
 
 ---
 
-## 📝 Padrão de Commits
+# Como Executar o Projeto
 
-Utilizado:
-
-```
-Conventional Commits
-```
-
-Exemplo:
-
-```
-feat: adiciona autenticação JWT
-
-fix: corrige conexão com banco
-
-docs: atualiza documentação
-```
-
----
-
-## 🚫 Arquivos Ignorados
-
-Configurado:
-
-- `.gitignore`
-- `.dockerignore`
-
-Bloqueando:
-
-```
-venv/
-__pycache__/
-.env
-*.pyc
-```
-
----
-
-# 🚀 Como Rodar o Projeto Localmente
-
-## Pré-requisitos
-
-Instalar:
-
-- Git
-- Docker
-- Docker Compose
-
----
-
-# 1. Clonar o projeto
+## Clonar o repositório
 
 ```bash
 git clone https://github.com/rodrigoMrtz/Projeto-DevOps-API.git
@@ -192,54 +109,25 @@ cd Projeto-DevOps-API
 
 ---
 
-# 2. Configurar variáveis de ambiente
-
-Copie o arquivo de exemplo:
+## Configurar as variáveis de ambiente
 
 ```bash
 cp .env.example .env
 ```
 
-Configure os valores necessários.
+Edite o arquivo `.env` conforme necessário.
 
 ---
 
-# 3. Subir infraestrutura
-
-Execute:
+## Inicializar os containers
 
 ```bash
 docker compose up -d
 ```
 
-O Docker irá:
-
-- Criar a rede
-- Criar containers
-- Configurar PostgreSQL
-- Iniciar API
-
 ---
 
-# 🌐 Acessar API
-
-A aplicação estará disponível em:
-
-```
-http://127.0.0.1:8080
-```
-
-Documentação automática FastAPI:
-
-```
-http://127.0.0.1:8080/docs
-```
-
----
-
-# 🛠️ Comandos Úteis
-
-Ver containers ativos:
+## Verificar os serviços
 
 ```bash
 docker compose ps
@@ -247,7 +135,7 @@ docker compose ps
 
 ---
 
-Acompanhar logs da API:
+## Logs da aplicação
 
 ```bash
 docker compose logs -f web-api
@@ -255,7 +143,7 @@ docker compose logs -f web-api
 
 ---
 
-Parar ambiente:
+## Parar os containers
 
 ```bash
 docker compose down
@@ -263,6 +151,35 @@ docker compose down
 
 ---
 
-# 👨‍💻 Desenvolvido por
+# Acessando a Aplicação
 
-**Rodrigo Martinez Ortiz**
+API
+
+```
+http://localhost:3000
+```
+
+Swagger UI
+
+```
+http://localhost:3000/docs
+```
+
+OpenAPI
+
+```
+http://localhost:3000/openapi.json
+```
+
+---
+
+# Variáveis de Ambiente
+
+O projeto utiliza um arquivo `.env` baseado no modelo disponível em:
+
+```text
+.env.example
+```
+
+# Desenvolvido por
+Rodrigo Martinez Ortiz
