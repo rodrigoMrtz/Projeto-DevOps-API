@@ -18,11 +18,12 @@ services:
 
   # Serviço 2: A nossa API Python
   web-api:
-    image: ${{ secrets.DOCKERHUB_USERNAME }}/minha-api-devops:latest
+    image: rodrigomrtz/minha-api-devops:latest
+    build: .
     container_name: devops-python-api
     restart: always
     ports:
-      - "3000:8000"
+      - "3000:3000"
     environment:
       - APP_ENV=production
       - API_SECRET_KEY=${API_SECRET_KEY}
