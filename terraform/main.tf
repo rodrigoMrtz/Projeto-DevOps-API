@@ -2,17 +2,6 @@
 terraform {
   required_version = ">= 1.5.0"
 
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.0"
-    }
-  }
-}
-
-# 2. Configurando o Provedor AWS e apontando para a variável de região
-provider "aws" {
-  region = var.aws_region
 }
 
 # 3. Criando a VPC Virtual Private Cloud(Rede Privada)
@@ -144,4 +133,11 @@ resource "aws_instance" "web_server" {
   tags = {
     Name = "${var.projeto_name}-api-server"
   }
+}
+
+# Recurso que cria ou atualiza o segredo do IP dinâmico direto no seu repositório
+resource "github_actions_secret" "aws_ip_secret" {
+  repository  = "Projeto-DevOps-API"
+  secret_name = "AWS_INSTANCE_IP"
+  value       = aws_instance.web_server.public_ip # Puxa o IP dinâmico da sua EC2 criada
 }
