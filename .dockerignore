@@ -4,3 +4,15 @@ __pycache__/
 *.pyc
 .git
 .env
+
+# Ignore all Terraform variable files
+*.tfvars
+*.tfvars.json
+
+# Ignore local Terraform state and overrides
+.terraform/
+*.tfstate
+*.tfstate.*
+.terraform.tfstate.lock.info
+*.override.tf
+*.override.tf.json

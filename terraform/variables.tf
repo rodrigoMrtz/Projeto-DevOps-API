@@ -14,3 +14,9 @@ variable "ssh_public_key" {
   type        = string
   description = "Chave pública SSH ED25519 para acesso à instância EC2"
 }
+
+variable "github_token" {
+  description = "Token de Acesso Pessoal (PAT) do GitHub com permissão de escrita em segredos"
+  type        = string
+  sensitive   = true
+}

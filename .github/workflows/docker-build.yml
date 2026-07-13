@@ -3,6 +3,8 @@ name: Build and Push Docker Image
 on:
   push:
     branches: [ "main" ] # Dispara sempre que houver um push na main
+  pull_request:
+    branches: [ "main" ] # Dispara se alguém tentar abrir um pull request para a main
 
 jobs:
   build-and-push:
