@@ -19,4 +19,8 @@ systemctl enable docker
 # Garante que o usuário padrão 'ubuntu' fará parte do grupo do Docker
 usermod -aG docker ubuntu
 
+# Cria o diretório para a aplicação e ajusta permissões
+mkdir -p /home/ubuntu/app
+chown -R ubuntu:ubuntu /home/ubuntu/app
+
 echo "✅ Automação concluída com sucesso!"

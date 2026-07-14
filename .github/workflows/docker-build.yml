@@ -68,7 +68,12 @@ jobs:
           key: ${{ secrets.AWS_SSH_KEY }}
           script: |
             cd /home/ubuntu/app/
-            # Baixa a nova imagem que o job anterior acabou de subir no Docker Hub
+            # Cria o arquivo .env dinamicamente com segredos do repositório
+            echo "DB_USER=${{ secrets.DB_USER }}" > .env
+            echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
+            echo "DB_NAME=${{ secrets.DB_NAME }}" >> .env
+            echo "API_SECRET_KEY=${{ secrets.API_SECRET_KEY }}" >> .env
+            # Puxa a imagem mais recente do Docker Hub
             docker compose pull
-            # Reinicia apenas o que mudou (web-api) sem derrubar o banco de dados
+            # Atualiza os containers com a nova imagem
             docker compose up -d

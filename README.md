@@ -12,6 +12,8 @@
 
 </p>
 
+![CI Pipeline](https://github.com/rodrigoMrtz/Projeto-DevOps-API/actions/workflows/ci.yml/badge.svg)
+
 Este projeto demonstra o ciclo completo de Engenharia de DevOps para a criação, conteinerização, automação de testes/build (CI) e deploy (CD) de uma API baseada em FastAPI integrada a um banco de dados relacional PostgreSQL.
 
 Desenvolvido com foco em automação de infraestrutura, segurança de credenciais e esteiras de implantação automatizadas.
@@ -37,7 +39,7 @@ Arquitetura de Rede e Portas:
         │   ┌────────────────────────┐       │
         │   │    Docker Container    │       │
         │   │        web-api         │       │
-        │   │   Porta Interna: 8000  │       │
+        │   │   Porta Interna: 3000  │       │
         │   │   Exposta Host: 3000   │       │
         │   └───────────┬────────────┘       │
         │               │                    │
@@ -84,6 +86,15 @@ Toda a infraestrutura de nuvem na AWS (VPC, Subnets, Internet Gateway, Route Tab
 
 ## 4. Gerenciamento de Credenciais
 Arquivos de ambiente (.env) estão explicitamente inclusos no .gitignore e .dockerignore. A API resgata as chaves em runtime por meio de injeções diretas passadas pelo ambiente do Docker Compose no servidor.
+
+## 5. Práticas de Segurança em Redes (Security Groups)
+> [!NOTE]  
+> **Nota sobre Segurança de Acesso Remoto:** Para fins acadêmicos, de demonstração prática de habilidades e facilidade de manutenção no laboratório de estudos, o acesso SSH (Porta 22) no Security Group da EC2 foi configurado como aberto para o mundo (`0.0.0.0/0`). 
+> 
+> **Em um ambiente de produção real**, esta prática é altamente desencorajada. Para mitigar esse risco de segurança e restringir a superfície de ataque, aplicaríamos uma das seguintes abordagens:
+> - Limitar o bloco CIDR de entrada estritamente para o IP corporativo confiável ou o IP público do operador.
+> - Utilizar um **Bastion Host** (Jump Box) em uma Subnet Pública com o servidor da API isolado em uma Subnet Privada.
+> - Implementar conexões seguras através do **AWS Systems Manager (SSM) Session Manager**, eliminando completamente a necessidade de abrir a porta 22 para a internet externa.
 
 ---
 
